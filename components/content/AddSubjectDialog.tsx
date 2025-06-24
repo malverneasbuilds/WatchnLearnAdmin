@@ -30,6 +30,7 @@ export function AddSubjectDialog({ trigger, onSubjectAdded }: AddSubjectDialogPr
     description: '',
     level: '',
     examBoards: [] as string[],
+    school: '',
     icon: 'BookOpen',
     teachers: [] as Teacher[],
   });
@@ -85,6 +86,7 @@ export function AddSubjectDialog({ trigger, onSubjectAdded }: AddSubjectDialogPr
         description: formData.description,
         level: formData.level,
         examBoard: examBoard,
+        school: formData.school,
         teachers: formData.teachers,
         enrolledStudents: 0,
         contentItems: 0,
@@ -141,6 +143,7 @@ export function AddSubjectDialog({ trigger, onSubjectAdded }: AddSubjectDialogPr
       description: '',
       level: '',
       examBoards: [],
+      school: '',
       icon: 'BookOpen',
       teachers: [],
     });
@@ -186,6 +189,16 @@ export function AddSubjectDialog({ trigger, onSubjectAdded }: AddSubjectDialogPr
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="school">School (Optional)</Label>
+            <Input
+              id="school"
+              value={formData.school}
+              onChange={(e) => setFormData(prev => ({ ...prev, school: e.target.value }))}
+              placeholder="e.g., Harare High School"
+            />
           </div>
 
           <div className="space-y-2">

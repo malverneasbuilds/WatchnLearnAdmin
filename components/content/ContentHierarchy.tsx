@@ -12,6 +12,12 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   ChevronDown,
   ChevronRight,
   BookOpen,
@@ -27,6 +33,8 @@ import {
   ArrowDown,
   Check,
   X,
+  Copy,
+  MoreHorizontal,
 } from 'lucide-react';
 import { AddHierarchyItemDialog } from './AddHierarchyItemDialog';
 
@@ -47,6 +55,8 @@ interface Chapter {
   order: number;
   topics: Topic[];
   isExpanded?: boolean;
+  isContinuation?: boolean;
+  originalChapterId?: number;
 }
 
 interface Week {
@@ -70,6 +80,7 @@ interface Subject {
   name: string;
   level: string;
   examBoard: string;
+  school?: string;
   terms: Term[];
   isExpanded?: boolean;
 }
@@ -219,7 +230,7 @@ export function ContentHierarchy({ subjects: initialSubjects }: ContentHierarchy
                             duration: data.duration,
                             estimatedTime: data.estimatedTime,
                             order: chapter.topics.length + 1,
-                            status: 'draft',
+                            status: 'published',
                           };
                           return {
                             ...chapter,
@@ -233,6 +244,52 @@ export function ContentHierarchy({ subjects: initialSubjects }: ContentHierarchy
                   return week;
                 }),
               };
+            }
+            return term;
+          }),
+        };
+      }
+      return subject;
+    }));
+  };
+
+  const continueChapterToNextWeek = (subjectId: number, termId: number, weekId: number, chapterId: number) => {
+    setSubjects(prev => prev.map(subject => {
+      if (subject.id === subjectId) {
+        return {
+          ...subject,
+          terms: subject.terms.map(term => {
+            if (term.id === termId) {
+              const currentWeekIndex = term.weeks.findIndex(w => w.id === weekId);
+              const nextWeek = term.weeks[currentWeekIndex + 1];
+              
+              if (nextWeek) {
+                const originalChapter = term.weeks[currentWeekIndex].chapters.find(c => c.id === chapterId);
+                
+                if (originalChapter) {
+                  const continuationChapter: Chapter = {
+                    ...originalChapter,
+                    id: Date.now(),
+                    isContinuation: true,
+                    originalChapterId: originalChapter.id,
+                    order: nextWeek.chapters.length + 1,
+                    topics: [],
+                  };
+
+                  return {
+                    ...term,
+                    weeks: term.weeks.map(week => {
+                      if (week.id === nextWeek.id) {
+                        return {
+                          ...week,
+                          chapters: [...week.chapters, continuationChapter],
+                        };
+                      }
+                      return week;
+                    }),
+                  };
+                }
+              }
             }
             return term;
           }),
@@ -615,33 +672,46 @@ export function ContentHierarchy({ subjects: initialSubjects }: ContentHierarchy
                   </Button>
                 </div>
               ) : (
-                <span className="font-medium">{chapter.title}</span>
+                <div className="flex items-center space-x-2">
+                  <span className="font-medium">{chapter.title}</span>
+                  {chapter.isContinuation && (
+                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">
+                      Continued
+                    </Badge>
+                  )}
+                </div>
               )}
               <Badge variant="outline">{chapter.topics.length} topics</Badge>
             </div>
             <div className="flex items-center space-x-1">
               {!isEditing && (
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    startEditing(`chapter-${chapter.id}`, chapter.title);
-                  }}
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
+                <>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
+                        <MoreHorizontal className="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => startEditing(`chapter-${chapter.id}`, chapter.title)}>
+                        <Edit className="mr-2 h-3 w-3" />
+                        Edit Chapter
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => continueChapterToNextWeek(subjectId, termId, weekId, chapter.id)}>
+                        <Copy className="mr-2 h-3 w-3" />
+                        Continue to Next Week
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => deleteItem('chapter', chapter.id, [subjectId, termId, weekId])}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="mr-2 h-3 w-3" />
+                        Delete Chapter
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
               )}
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteItem('chapter', chapter.id, [subjectId, termId, weekId]);
-                }}
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -824,7 +894,7 @@ export function ContentHierarchy({ subjects: initialSubjects }: ContentHierarchy
         <CardHeader>
           <CardTitle>Content Hierarchy</CardTitle>
           <p className="text-sm text-gray-600">
-            Organize content by Subject → Term → Week → Chapter → Topics. Click edit buttons to modify items, use plus buttons to add new items, and arrow buttons to reorder topics.
+            Organize content by Subject → Term → Week → Chapter → Topics. Click edit buttons to modify items, use plus buttons to add new items, arrow buttons to reorder topics, and "Continue to Next Week" to extend chapters across weeks.
           </p>
         </CardHeader>
         <CardContent>
@@ -882,6 +952,9 @@ export function ContentHierarchy({ subjects: initialSubjects }: ContentHierarchy
                             <span className="font-semibold">{subject.name}</span>
                             <Badge className="bg-purple-100 text-purple-800">{subject.level}</Badge>
                             <Badge variant="outline">{subject.examBoard}</Badge>
+                            {subject.school && (
+                              <Badge variant="secondary" className="text-xs">{subject.school}</Badge>
+                            )}
                           </>
                         )}
                       </div>

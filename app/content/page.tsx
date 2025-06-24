@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Filter, Plus, Upload, MoreHorizontal, BookOpen, Video, FileText } from 'lucide-react';
+import { Search, Filter, Plus, MoreHorizontal, BookOpen, Video, FileText } from 'lucide-react';
 import { AddContentDialog } from '@/components/content/AddContentDialog';
 import { ContentHierarchy } from '@/components/content/ContentHierarchy';
 
@@ -158,8 +158,8 @@ const contentItems = [
     type: 'pdf',
     level: 'O-Level',
     examBoard: 'Cambridge',
-    status: 'draft',
-    views: 0,
+    status: 'published',
+    views: 890,
     pages: 24,
     createdAt: '2024-01-14',
     updatedAt: '2024-01-15',
@@ -184,8 +184,8 @@ const contentItems = [
     type: 'video',
     level: 'O-Level',
     examBoard: 'Cambridge',
-    status: 'review',
-    views: 0,
+    status: 'published',
+    views: 1245,
     duration: '22:15',
     createdAt: '2024-01-13',
     updatedAt: '2024-01-14',
@@ -243,10 +243,6 @@ export default function ContentPage() {
           <p className="text-gray-600 mt-2">Manage educational content across all subjects and levels</p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" className="flex items-center space-x-2">
-            <Upload className="h-4 w-4" />
-            <span>Bulk Upload</span>
-          </Button>
           <AddContentDialog
             trigger={
               <Button className="flex items-center space-x-2">
@@ -270,23 +266,23 @@ export default function ContentPage() {
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-gray-900">6,234</div>
+            <div className="text-2xl font-bold text-gray-900">8,429</div>
             <div className="text-sm text-gray-600">Published</div>
-            <div className="text-xs text-success mt-1">73.8% of total</div>
+            <div className="text-xs text-success mt-1">100% of total</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-gray-900">1,247</div>
+            <div className="text-2xl font-bold text-gray-900">0</div>
             <div className="text-sm text-gray-600">In Review</div>
-            <div className="text-xs text-warning mt-1">14.8% of total</div>
+            <div className="text-xs text-gray-500 mt-1">0% of total</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-gray-900">948</div>
+            <div className="text-2xl font-bold text-gray-900">0</div>
             <div className="text-sm text-gray-600">Drafts</div>
-            <div className="text-xs text-gray-500 mt-1">11.2% of total</div>
+            <div className="text-xs text-gray-500 mt-1">0% of total</div>
           </CardContent>
         </Card>
       </div>

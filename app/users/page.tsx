@@ -21,9 +21,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Filter, Download, UserPlus, MoreHorizontal } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Search, Filter, Download, MoreHorizontal, Eye, Edit, Trash2, Ban, CheckCircle } from 'lucide-react';
 
-const users = [
+const initialUsers = [
   {
     id: 1,
     name: 'Tendai Mukamuri',
@@ -90,6 +98,7 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('all');
   const [selectedExamBoard, setSelectedExamBoard] = useState('all');
+  const [users, setUsers] = useState(initialUsers);
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -101,6 +110,35 @@ export default function UsersPage() {
     return matchesSearch && matchesLevel && matchesExamBoard;
   });
 
+  const handleUserAction = (userId: number, action: string) => {
+    setUsers(prev => prev.map(user => {
+      if (user.id === userId) {
+        switch (action) {
+          case 'suspend':
+            return { ...user, status: 'suspended' };
+          case 'activate':
+            return { ...user, status: 'active' };
+          case 'delete':
+            // In a real app, you'd probably want to show a confirmation dialog
+            return null;
+          default:
+            return user;
+        }
+      }
+      return user;
+    }).filter(Boolean) as typeof initialUsers);
+  };
+
+  const handleViewUser = (userId: number) => {
+    // In a real app, this would navigate to user details page
+    console.log('Viewing user:', userId);
+  };
+
+  const handleEditUser = (userId: number) => {
+    // In a real app, this would open an edit modal or navigate to edit page
+    console.log('Editing user:', userId);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -108,10 +146,6 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
           <p className="text-gray-600 mt-2">Manage student accounts and monitor user activity</p>
         </div>
-        <Button className="flex items-center space-x-2">
-          <UserPlus className="h-4 w-4" />
-          <span>Add User</span>
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -206,7 +240,7 @@ export default function UsersPage() {
                   <TableHead>Subjects</TableHead>
                   <TableHead>Last Active</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
+                  <TableHead className="w-[50px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -258,9 +292,50 @@ export default function UsersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => handleViewUser(user.id)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditUser(user.id)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit User
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {user.status === 'active' ? (
+                            <DropdownMenuItem 
+                              onClick={() => handleUserAction(user.id, 'suspend')}
+                              className="text-warning"
+                            >
+                              <Ban className="mr-2 h-4 w-4" />
+                              Suspend User
+                            </DropdownMenuItem>
+                          ) : user.status === 'suspended' ? (
+                            <DropdownMenuItem 
+                              onClick={() => handleUserAction(user.id, 'activate')}
+                              className="text-success"
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Activate User
+                            </DropdownMenuItem>
+                          ) : null}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            onClick={() => handleUserAction(user.id, 'delete')}
+                            className="text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete User
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -42,7 +42,6 @@ const menuItems = [
     children: [
       { title: 'All Content', href: '/content' },
       { title: 'Subjects', href: '/content/subjects' },
-      { title: 'Media Library', href: '/content/media' },
     ],
   },
   {

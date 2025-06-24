@@ -29,6 +29,7 @@ const initialSubjects = [
     name: 'Mathematics',
     level: 'A-Level',
     examBoard: 'ZIMSEC',
+    school: 'Harare High School',
     enrolledStudents: 2450,
     contentItems: 156,
     completionRate: 78,
@@ -51,6 +52,7 @@ const initialSubjects = [
     name: 'Chemistry',
     level: 'O-Level',
     examBoard: 'ZIMSEC',
+    school: 'St. Johns College',
     enrolledStudents: 3200,
     contentItems: 134,
     completionRate: 69,
@@ -73,6 +75,7 @@ const initialSubjects = [
     name: 'English',
     level: 'A-Level',
     examBoard: 'ZIMSEC',
+    school: 'Prince Edward School',
     enrolledStudents: 4100,
     contentItems: 98,
     completionRate: 85,
@@ -100,7 +103,8 @@ export default function SubjectsPage() {
   const [subjects, setSubjects] = useState(initialSubjects);
 
   const filteredSubjects = subjects.filter(subject => {
-    const matchesSearch = subject.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = subject.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (subject.school && subject.school.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesLevel = selectedLevel === 'all' || subject.level === selectedLevel;
     const matchesExamBoard = selectedExamBoard === 'all' || subject.examBoard === selectedExamBoard;
     
@@ -211,7 +215,7 @@ export default function SubjectsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search subjects..."
+                placeholder="Search subjects or schools..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -247,6 +251,7 @@ export default function SubjectsPage() {
                   <TableHead>Subject</TableHead>
                   <TableHead>Level</TableHead>
                   <TableHead>Exam Board</TableHead>
+                  <TableHead>School</TableHead>
                   <TableHead>Students</TableHead>
                   <TableHead>Content Items</TableHead>
                   <TableHead>Completion Rate</TableHead>
@@ -272,6 +277,9 @@ export default function SubjectsPage() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{subject.examBoard}</Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-600">
+                      {subject.school || '-'}
                     </TableCell>
                     <TableCell className="text-sm text-gray-600">
                       {subject.enrolledStudents.toLocaleString()}

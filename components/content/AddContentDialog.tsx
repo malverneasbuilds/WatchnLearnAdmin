@@ -133,7 +133,7 @@ export function AddContentDialog({ trigger, onContentAdded, subjects }: AddConte
       week: formData.weekNumber,
       chapter: isNewChapter ? formData.newChapterTitle : selectedChapter?.title,
       createdAt: new Date().toISOString(),
-      status: 'draft',
+      status: 'published', // Changed from 'draft' to 'published'
       views: 0,
     };
 
