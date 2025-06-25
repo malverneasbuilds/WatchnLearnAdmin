@@ -16,6 +16,8 @@ import {
   Settings,
   Users,
   X,
+  Library,
+  ClipboardList,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -48,6 +50,16 @@ const menuItems = [
     title: 'Past Papers',
     icon: FileText,
     href: '/past-papers',
+  },
+  {
+    title: 'Textbooks',
+    icon: Library,
+    href: '/textbooks',
+  },
+  {
+    title: 'Syllabus',
+    icon: ClipboardList,
+    href: '/syllabus',
   },
   {
     title: 'Analytics',
