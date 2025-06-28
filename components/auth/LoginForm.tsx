@@ -112,14 +112,11 @@ export function LoginForm() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Need an admin account?{' '}
-              <button
-                onClick={() => router.push('/signup')}
-                className="text-primary hover:text-primary/80 font-medium"
-                disabled={loading}
-              >
-                Create one here
-              </button>
+              Demo Credentials:
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Email: admin@watchnlearn.com<br />
+              Password: admin123
             </p>
           </div>
         </CardContent>
