@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { signIn } from '@/lib/auth';
 import { GraduationCap, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -113,13 +114,12 @@ export function LoginForm() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Need an admin account?{' '}
-              <button
-                onClick={() => router.push('/signup')}
-                className="text-primary hover:text-primary/80 font-medium"
-                disabled={loading}
+              <Link 
+                href="/signup"
+                className="text-primary hover:text-primary/80 font-medium underline"
               >
                 Create one here
-              </button>
+              </Link>
             </p>
           </div>
         </CardContent>
