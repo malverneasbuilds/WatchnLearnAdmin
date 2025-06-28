@@ -37,7 +37,7 @@ export const signIn = async (email: string, password: string) => {
   return data;
 };
 
-export const signUp = async (email: string, password: string, fullName: string, role: string = 'admin') => {
+export const signUp = async (email: string, password: string, fullName: string) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -45,7 +45,7 @@ export const signUp = async (email: string, password: string, fullName: string, 
 
   if (error) throw error;
 
-  // Create profile
+  // Create profile for new user
   if (data.user) {
     const { error: profileError } = await supabase
       .from('profiles')
@@ -53,7 +53,7 @@ export const signUp = async (email: string, password: string, fullName: string, 
         id: data.user.id,
         email,
         full_name: fullName,
-        role: role as any,
+        role: 'teacher', // Default role for new users is now 'teacher'
       });
 
     if (profileError) throw profileError;
