@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ export function LoginForm() {
 
     try {
       await signIn(email, password);
-      // Navigation will be handled by the AuthContext
+      router.push('/');
     } catch (err: any) {
       setError(err.message || 'An error occurred during sign in');
     } finally {
@@ -112,12 +113,13 @@ export function LoginForm() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Need an admin account?{' '}
-              <Link 
-                href="/signup" 
-                className="text-primary hover:text-primary/80 font-medium underline"
+              <button
+                onClick={() => router.push('/signup')}
+                className="text-primary hover:text-primary/80 font-medium"
+                disabled={loading}
               >
                 Create one here
-              </Link>
+              </button>
             </p>
           </div>
         </CardContent>
