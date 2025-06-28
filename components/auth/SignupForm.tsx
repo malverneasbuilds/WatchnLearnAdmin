@@ -7,27 +7,57 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { signIn } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 import { GraduationCap, Eye, EyeOff } from 'lucide-react';
 
-export function LoginForm() {
+export function SignupForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     try {
-      await signIn(email, password);
-      router.push('/');
+      // Sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError) throw authError;
+
+      if (authData.user) {
+        // Create admin profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: email,
+            full_name: fullName,
+            role: 'admin',
+            is_active: true,
+          });
+
+        if (profileError) throw profileError;
+
+        setSuccess('Admin account created successfully! You can now sign in.');
+        
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          router.push('/');
+        }, 2000);
+      }
     } catch (err: any) {
-      setError(err.message || 'An error occurred during sign in');
+      setError(err.message || 'An error occurred during signup');
     } finally {
       setLoading(false);
     }
@@ -44,10 +74,10 @@ export function LoginForm() {
           </div>
           <div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              WatchnLearn Admin
+              Create Admin Account
             </CardTitle>
             <p className="text-gray-600 mt-2">
-              Sign in to access the admin dashboard
+              Sign up for admin access to WatchnLearn
             </p>
           </div>
         </CardHeader>
@@ -58,7 +88,26 @@ export function LoginForm() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+
+            {success && (
+              <Alert className="border-success bg-success/10 text-success">
+                <AlertDescription>{success}</AlertDescription>
+              </Alert>
+            )}
             
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your full name"
+                required
+                disabled={loading}
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <Input
@@ -80,9 +129,10 @@ export function LoginForm() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder="Create a strong password"
                   required
                   disabled={loading}
+                  minLength={6}
                 />
                 <Button
                   type="button"
@@ -106,19 +156,19 @@ export function LoginForm() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Creating Account...' : 'Create Admin Account'}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Need an admin account?{' '}
+              Already have an account?{' '}
               <button
-                onClick={() => router.push('/signup')}
+                onClick={() => router.push('/')}
                 className="text-primary hover:text-primary/80 font-medium"
                 disabled={loading}
               >
-                Create one here
+                Sign in here
               </button>
             </p>
           </div>
