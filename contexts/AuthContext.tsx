@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         const { data: profileData } = await auth.getUserProfile(session.user.id);
         setProfile(profileData);
-        setIsAdmin(profileData?.role === '' || profileData?.role === 'super_admin');
+        setIsAdmin(profileData?.role === NULL || profileData?.role === 'super_admin');
       }
       
       setLoading(false);
